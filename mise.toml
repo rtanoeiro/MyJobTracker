@@ -38,7 +38,7 @@ run = [
 ]
 
 [tasks.checks]
-depends = ["clean", "fmt", "lint", "sec", "govul", "test",]
+depends = ["clean", "fmt", "lint", "sec", "govul", "test"]
 description = "Run all checks (clean,  format, lint, security, vulnerabilities, test)"
 
 [tasks.sqlc-generate]
@@ -56,12 +56,12 @@ run = "goose down-to 0"
 # Build tasks are only used for prod. amd64 tags are what docker-compose-prod.yml references;
 # -arm64 tags are the matching builds for ARM hosts. Push both and assemble a manifest to publish multi-arch.
 [tasks.build]
-description = "Build amd64 Docker image (job-applications:latest)"
-run = "docker build -f docker/Dockerfile --platform linux/amd64 . -t rtanoeiro/job-applications:latest"
+description = "Build amd64 Docker image (myjobtracker:latest)"
+run = "docker build -f docker/Dockerfile --platform linux/amd64 . -t rtanoeiro/myjobtracker:latest"
 
 [tasks.build-arm64]
-description = "Build arm64 Docker image (job-applications:latest-arm64)"
-run = "docker build -f docker/Dockerfile --platform linux/arm64 . -t rtanoeiro/job-applications:latest-arm64"
+description = "Build arm64 Docker image (myjobtracker:latest-arm64)"
+run = "docker build -f docker/Dockerfile --platform linux/arm64 . -t rtanoeiro/myjobtracker:latest-arm64"
 
 ## Dev only creates database and adminer, we use air to reload the app in dev to speed development
 [tasks.up-dev]
