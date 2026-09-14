@@ -632,7 +632,7 @@ func TestUpdateAISettings_SaveWithNewKey(t *testing.T) {
 		t.Errorf("EffortLevel = %q, want max", store.LastUpsert.EffortLevel)
 	}
 	if string(store.LastUpsert.Key.String) != "sk-test" {
-		t.Errorf("Key = %q, want sk-test", store.LastUpsert.Key)
+		t.Errorf("Key = %s, want sk-test", store.LastUpsert.Key.String)
 	}
 }
 
@@ -666,7 +666,7 @@ func TestUpdateAISettings_EffortChangeKeepsKey(t *testing.T) {
 		t.Errorf("EffortLevel = %q, want max", store.LastUpsert.EffortLevel)
 	}
 	if !strings.EqualFold(store.LastUpsert.Key.String, "stored-key") {
-		t.Errorf("Key = %q, want stored-key kept on effort change", store.LastUpsert.Key)
+		t.Errorf("Key = %q, want stored-key kept on effort change", store.LastUpsert.Key.String)
 	}
 }
 
@@ -696,7 +696,7 @@ func TestUpdateAISettings_ProviderChangeClearsKey(t *testing.T) {
 		t.Fatalf("status = %d, want %d", w.Code, http.StatusOK)
 	}
 	if len(store.LastUpsert.Key.String) != 0 {
-		t.Errorf("Key = %q, want cleared after provider change", store.LastUpsert.Key)
+		t.Errorf("Key = %s, want cleared after provider change", store.LastUpsert.Key.String)
 	}
 	if store.LastUpsert.ProviderName != "Anthropic" || store.LastUpsert.EffortLevel != "low" {
 		t.Errorf("upsert = %s/%s/%s, want Anthropic/claude-opus-5/low", store.LastUpsert.ProviderName, store.LastUpsert.ModelName, store.LastUpsert.EffortLevel)
@@ -729,7 +729,7 @@ func TestUpdateAISettings_NewKeyReplacesOldAfterProviderChange(t *testing.T) {
 		t.Fatalf("status = %d, want %d", w.Code, http.StatusOK)
 	}
 	if store.LastUpsert.Key.String != "sk-anthropic" {
-		t.Errorf("Key = %q, want sk-anthropic", store.LastUpsert.Key)
+		t.Errorf("Key = %s, want sk-anthropic", store.LastUpsert.Key.String)
 	}
 }
 
@@ -814,7 +814,7 @@ func TestRemoveKey_DisablesAndClearsKey(t *testing.T) {
 		t.Fatal("expected upsert to be called")
 	}
 	if len(store.LastUpsert.Key.String) != 0 {
-		t.Errorf("Key = %q, want cleared", store.LastUpsert.Key)
+		t.Errorf("Key = %s, want cleared", store.LastUpsert.Key.String)
 	}
 	if store.LastUpsert.Enabled {
 		t.Error("Enabled = true, want disabled after key removal")
