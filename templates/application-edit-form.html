@@ -1,0 +1,114 @@
+{{ block "application-edit-form" . }}
+<div class="modal-overlay open" id="modal-overlay"
+  hx-on:click="if (event.target === this) document.getElementById('modal-container').innerHTML=''">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Edit Application</h2>
+      <button class="modal-close" hx-on:click="document.getElementById('modal-container').innerHTML=''">✕</button>
+    </div>
+    <form class="modal-form" hx-put="/applications/{{.ID}}"
+      hx-on::after-request="document.getElementById('modal-container').innerHTML=''">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Company *</label>
+          <input type="text" name="company" required placeholder="e.g. Stripe" value="{{.CompanyName}}" />
+        </div>
+        <div class="form-group">
+          <label>Company Website</label>
+          <input type="url" name="company_website" placeholder="e.g. https://www.companywebsite.com" />
+        </div>
+        <div class="form-group">
+          <label>Role *</label>
+          <input type="text" name="role" required placeholder="e.g. Senior Designer" value="{{.Role}}" />
+        </div>
+        <div class="form-group">
+          <label>Application Date</label>
+          <input type="date" name="date" value='{{ .Date.Time.Format "2006-01-02"}}' />
+        </div>
+        <div class="form-group">
+          <label>Work Model</label>
+          <select name="work_model">
+            {{ if eq .WorkModel "Remote"}}
+            <option value="Remote" selected>Remote</option>
+            {{ else }}
+            <option value="Remote">Remote</option>
+            {{ end }}
+
+            {{ if eq .WorkModel "Hybrid"}}
+            <option value="Hybrid" selected>Hybrid</option>
+            {{ else }}
+            <option value="Hybrid">Hybrid</option>
+            {{ end }}
+
+            {{ if eq .WorkModel "Onsite"}}
+            <option value="Onsite" selected>Onsite</option>
+            {{ else }}
+            <option value="Onsite">Onsite</option>
+            {{ end }}
+
+            {{ if eq .WorkModel "Not Specified"}}
+            <option value="Not Specified" selected>Not Specified</option>
+            {{ else }}
+            <option value="Not Specified">Not Specified</option>
+            {{ end }}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Sector</label>
+          <input type="text" name="sector" placeholder="e.g. Fintech" value="{{.Sector.String}}" />
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" name="location" placeholder="e.g. Remote / London" value="{{.Location.String}}" />
+        </div>
+        <div class="form-group">
+          <label>Salary</label>
+          <input type="text" name="salary" placeholder="e.g. £60,000" value="{{.Salary.String}}" />
+        </div>
+        <div class="form-group full-width">
+          <label>Job Listing Link</label>
+          <input type="url" name="link" placeholder="https://..." value="{{.Link.String}}" />
+        </div>
+        <div class="form-group full-width">
+          <label>LinkedIn Contact</label>
+          <input type="text" name="contact" placeholder="linkedin.com/in/recruiter-name"
+            value="{{.ContactLinkedinProfile.String}}" />
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status">
+            <option value="Applied" {{ if eq .Status "Applied" }}selected{{ end }}>Applied</option>
+            <option value="Not Applied" {{ if eq .Status "Not Applied" }}selected{{ end }}>Not Applied</option>
+            <option value="Processing" {{ if eq .Status "Processing" }}selected{{ end }}>Processing</option>
+            <option value="Interview" {{ if eq .Status "Interview" }}selected{{ end }}>Interview</option>
+            <option value="Offer" {{ if eq .Status "Offer" }}selected{{ end }}>Offer</option>
+            <option value="Rejected" {{ if eq .Status "Rejected" }}selected{{ end }}>Rejected</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Last Follow Up Contact At</label>
+          {{ if .LastFollowUpContactAt.Valid }}
+          <input type="date" name="last_follow_up_contact_at"
+            value='{{ .LastFollowUpContactAt.Time.Format "2006-01-02"}}' />
+          {{ else }}
+          <input type="date" name="last_follow_up_contact_at" value="" />
+          {{ end }}
+        </div>
+        <div class="form-group">
+          <label>Interview Date</label>
+          {{ if .InterviewDate.Valid }}
+          <input type="date" name="interview_date" value='{{ .InterviewDate.Time.Format "2006-01-02"}}' />
+          {{ else }}
+          <input type="date" name="interview_date" value="" />
+          {{ end }}
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary"
+          hx-on:click="document.getElementById('modal-container').innerHTML=''">Cancel</button>
+        <button type="submit" class="btn-primary">Update Application</button>
+      </div>
+    </form>
+  </div>
+</div>
+{{ end }}

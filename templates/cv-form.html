@@ -1,0 +1,87 @@
+{{ block "cv-form" . }}
+<div class="modal-overlay open" id="modal-overlay"
+  hx-on:click="if (event.target === this) document.getElementById('modal-container').innerHTML=''">
+  <div class="modal modal-cv">
+    <div class="modal-header">
+      <h2>New CV</h2>
+      <button class="modal-close"
+        hx-on:click="document.getElementById('modal-container').innerHTML=''">✕</button>
+    </div>
+
+    <form class="modal-form" hx-post="/cvs" hx-target="#cvs-grid" hx-swap="innerHTML">
+
+      <div class="form-group full-width cv-title-row">
+        <label>CV title *</label>
+        <input type="text" name="title" required placeholder="e.g. Software Engineer — Generalist" />
+      </div>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Profile</legend>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" name="profile_name" placeholder="Jane Doe" />
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" name="profile_location" placeholder="London, UK" />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Summary</legend>
+        <div class="form-group full-width">
+          <label>Professional summary</label>
+          <textarea name="summary" rows="5" placeholder="A short, punchy overview of who you are and what you bring…"></textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Skills</legend>
+        <div class="form-group full-width">
+          <label>Skills (semicolon-separated)</label>
+          <textarea name="skills" rows="2" placeholder="Go; PostgreSQL; leadership…"></textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Experience</legend>
+        {{ template "cv-add-experiences-button" 0 }}
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Education</legend>
+        <div class="form-group full-width">
+          <label>Education (semicolon-separated)</label>
+          <textarea name="education" rows="2" placeholder="Bachelors in Something, Acme University, 2017; Msc Degree, Acme University, 2021"></textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Certifications</legend>
+        <div class="form-group full-width">
+          <label>Certifications (semicolon-separated)</label>
+          <textarea name="certifications" rows="2" placeholder="Certified Something, 2019, Some Company; Certified at another thing, Another Company, 2021"></textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Academic contributions</legend>
+        <div class="form-group full-width">
+          <label>Academic contributions (semicolon-separated)</label>
+          <textarea name="academic" rows="2" placeholder="A paper; a conference talk…"></textarea>
+        </div>
+      </fieldset>
+
+      <div class="modal-actions">
+        <div>
+          <button type="button" class="btn-secondary"
+            hx-on:click="document.getElementById('modal-container').innerHTML=''">Cancel</button>
+          <button type="submit" class="btn-primary">Save CV</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{{ end }}

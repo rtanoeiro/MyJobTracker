@@ -1,0 +1,58 @@
+{{ block "notes" .}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyJobTracker — Notes</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4/dist/ext/response-targets.js"></script>
+</head>
+
+<body hx-boost="true">
+
+  <nav class="sidebar">
+
+    {{ template "sidebar" . }}
+
+
+  </nav>
+
+  <main class="main-content">
+
+    <header class="topbar">
+
+      <div class="topbar-left">
+        <h1 class="page-title">Notes</h1>
+        <span class="breadcrumb">/ workspace</span>
+      </div>
+
+      <div class="topbar-right">
+        <button class="btn-add" hx-get="/notes/new" hx-target="#modal-container" hx-swap="innerHTML">
+          + New Note
+        </button>
+
+      </div>
+    </header>
+    <div class="sidebar-footer">
+      <p class="sidebar-tip">💡 Use notes for interview prep, follow-up reminders, or personal reflections.</p>
+    </div>
+
+    <button class="note-card-edit-trigger" hx-get="/notes/{id}/edit" hx-target="#modal-container" hx-swap="innerHTML"
+      aria-label="Edit note">
+    </button>
+
+    <section class="notes-grid" id="notes-grid" hx-get="/notes/list" hx-trigger="load, notes-updated from:body"
+      hx-swap="innerHTML">
+    </section>
+
+  </main>
+
+  <div id="modal-container"></div>
+
+</body>
+
+</html>
+{{ end }}

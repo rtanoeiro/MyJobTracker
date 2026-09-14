@@ -1,0 +1,213 @@
+{{ block "account-settings" .}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyJobTracker — Account Settings</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@2.0.4" integrity="sha384-T41oglUPvXLGBVyRdZsVRxNWnOOqCynaPubjUVjxhsjFTKrFJGEMm3/0KGmNQ+Pg" crossorigin="anonymous"></script>
+</head>
+
+<body hx-boost="true" hx-ext="response-targets">
+
+  <div class="app-wrapper">
+
+    <nav class="sidebar">
+      {{ template "sidebar" . }}
+    </nav>
+
+    <main class="main-content">
+
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title">Account Settings</h1>
+          <span class="breadcrumb">/ preferences</span>
+        </div>
+      </header>
+
+      <section class="settings-shell">
+
+        <div class="settings-card">
+          <div class="settings-card-head">
+            <div>
+              <h2 class="settings-card-title">Profile</h2>
+              <p class="settings-card-desc">How you identify on this workspace.</p>
+            </div>
+          </div>
+
+          <div id="profile-status"></div>
+
+          <div class="settings-field">
+            <label class="settings-field-label" for="username-input">Username</label>
+            <form class="settings-inline-form"
+              hx-put="/account/username"
+              hx-target="#profile-status"
+              hx-target-error="#profile-status"
+              hx-swap="innerHTML">
+              <input id="username-input" type="text" name="username" value="{{ .Username }}" required />
+              <button type="submit" class="btn-primary">Save</button>
+            </form>
+          </div>
+
+          <div class="settings-field">
+            <label class="settings-field-label" for="email-input">Email</label>
+            <form class="settings-inline-form"
+              hx-put="/account/email"
+              hx-target="#profile-status"
+              hx-target-error="#profile-status"
+              hx-swap="innerHTML">
+              <input id="email-input" type="email" name="email" value="{{ .Email }}" required />
+              <button type="submit" class="btn-primary">Save</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-head">
+            <div>
+              <h2 class="settings-card-title">AI settings</h2>
+              <p class="settings-card-desc">Configure the provider used to match your CVs against job descriptions.</p>
+            </div>
+            {{ if .HasKey }}
+            <span class="badge badge-green">key saved</span>
+            {{ else }}
+            <span class="badge badge-grey">no key</span>
+            {{ end }}
+          </div>
+
+          <div id="ai-status"></div>
+
+          <form class="settings-form"
+            hx-put="/account/settings/ai"
+            hx-target="#ai-status"
+            hx-target-error="#ai-status"
+            hx-swap="innerHTML">
+
+            <div class="settings-field">
+              <label class="settings-field-label" for="provider-select">Provider</label>
+              <select id="provider-select" name="provider_name"
+                hx-get="/account/settings/ai/config"
+                hx-trigger="change"
+                hx-include="this"
+                hx-target="#ai-config-fields"
+                hx-target-error="#ai-config-fields"
+                hx-swap="outerHTML">
+                {{ if .Providers }}
+                  {{ if not .ProviderName }}
+                  <option value="" selected disabled>Choose a provider…</option>
+                  {{ end }}
+                  {{ range .Providers }}
+                  <option value="{{ . }}" {{ if eq . $.ProviderName }}selected{{ end }}>{{ . }}</option>
+                  {{ end }}
+                {{ else }}
+                <option value="" disabled>No providers configured</option>
+                {{ end }}
+              </select>
+            </div>
+
+            {{ template "ai-config-fields" . }}
+
+            <div class="settings-field">
+              <label class="settings-field-label" for="key-input">API key</label>
+              {{ if .HasKey }}
+              <input id="key-input" type="password" name="encrypted_key" placeholder="Leave blank to keep the saved key"
+                autocomplete="new-password" />
+              <p class="settings-hint">A key is already saved. Enter a new one only to replace it.</p>
+              <button type="button" class="settings-remove-key"
+                hx-delete="/account/settings/ai/key"
+                hx-target="#ai-status"
+                hx-target-error="#ai-status"
+                hx-swap="innerHTML"
+                hx-confirm="Remove the saved API key? AI matching will be disabled.">
+                Remove key
+              </button>
+              {{ else }}
+              <input id="key-input" type="password" name="encrypted_key" placeholder="sk-…" autocomplete="new-password"
+                required />
+              {{ end }}
+            </div>
+
+            <label class="settings-toggle">
+              <input type="checkbox" name="enabled" value="true" {{ if .Enabled }}checked{{ end }} />
+              <span>Enable AI CV matching</span>
+            </label>
+
+            <div class="settings-actions">
+              <button type="submit" class="btn-primary">Save settings</button>
+            </div>
+          </form>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+
+</html>
+{{ end }}
+
+{{ define "ai-config-fields" }}
+<div id="ai-config-fields">
+  <div class="settings-field">
+    <label class="settings-field-label" for="model-select">Model</label>
+    <select id="model-select" name="model_name"
+      hx-get="/account/settings/ai/efforts"
+      hx-trigger="change"
+      hx-include="#provider-select"
+      hx-target="#effort-select"
+      hx-target-error="#effort-select"
+      hx-swap="innerHTML">
+      {{ if .ProviderName }}
+        {{ template "ai-model-options" . }}
+      {{ else }}
+        <option value="" selected disabled>Choose a provider first</option>
+      {{ end }}
+    </select>
+    <p class="settings-hint">Base URL is inherited from the chosen provider.</p>
+  </div>
+
+  <div class="settings-field">
+    <label class="settings-field-label" for="effort-select">Effort</label>
+    <select id="effort-select" name="effort_level">
+      {{ if and .ProviderName .ModelName }}
+        {{ template "ai-effort-options" . }}
+      {{ else }}
+        <option value="" selected disabled>Choose a model first</option>
+      {{ end }}
+    </select>
+    <p class="settings-hint">Reasoning effort used when matching your CVs.</p>
+  </div>
+</div>
+{{ end }}
+
+{{ define "ai-model-options" }}
+  {{ if .Models }}
+    {{ if not .ModelName }}
+    <option value="" selected disabled>Choose a model…</option>
+    {{ end }}
+    {{ range .Models }}
+    <option value="{{ . }}" {{ if eq . $.ModelName }}selected{{ end }}>{{ . }}</option>
+    {{ end }}
+  {{ else }}
+    <option value="" disabled>No models available</option>
+  {{ end }}
+{{ end }}
+
+{{ define "ai-effort-options" }}
+  {{ if .Efforts }}
+    {{ if not .EffortLevel }}
+    <option value="" selected disabled>Choose an effort…</option>
+    {{ end }}
+    {{ range .Efforts }}
+    <option value="{{ . }}" {{ if eq . $.EffortLevel }}selected{{ end }}>{{ . }}</option>
+    {{ end }}
+  {{ else }}
+    <option value="" disabled>No efforts available</option>
+  {{ end }}
+{{ end }}

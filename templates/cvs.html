@@ -1,0 +1,48 @@
+{{ block "cvs" .}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyJobTracker — CVs</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+
+<body hx-boost="true">
+
+  <div class="app-wrapper">
+
+    <nav class="sidebar">
+      {{ template "sidebar" . }}
+    </nav>
+
+    <main class="main-content">
+
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title">CVs</h1>
+          <span class="breadcrumb">/ documents</span>
+        </div>
+        <div class="topbar-right">
+          <button class="btn-add" hx-get="/cvs/new" hx-target="#modal-container" hx-swap="innerHTML">
+            + New CV
+          </button>
+        </div>
+      </header>
+
+      <section class="cv-grid" id="cvs-grid" hx-get="/cvs/list" hx-trigger="load, cvs-updated from:body"
+        hx-swap="innerHTML">
+      </section>
+
+    </main>
+
+  </div>
+
+  <div id="modal-container"></div>
+
+</body>
+
+</html>
+{{ end }}

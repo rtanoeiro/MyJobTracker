@@ -1,0 +1,59 @@
+{{ block "register" . }}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — MyJobTracker</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4/dist/ext/response-targets.js"></script>
+</head>
+
+<body hx-boost="true" class="login-page">
+
+  <div class="login-container">
+
+    <div class="login-card">
+
+      <div class="login-header">
+        <img src="/static/logo.png" alt="MyJobTracker logo" class="logo-mark" />
+        <h1 class="login-title"><strong>MyJobTracker</strong></h1>
+        <p class="login-subtitle">Start tracking your job applications</p>
+      </div>
+
+      <form class="login-form" hx-ext="response-targets" hx-post="/register" hx-target="#register-message"
+        hx-target-error="#register-message" hx-swap="innerHTML" hx-indicator="#register-btn">
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="username" id="username" name="username" required placeholder="Inform your desired username" />
+        </div>
+        <div id="register-message"></div>
+
+        <button type="submit" class="btn-primary btn-full" id="register-btn">
+          <span class="btn-text">Create Account</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+
+      </form>
+
+      <div class="login-footer">
+        <span class="login-text">Already have an account?</span>
+        <a href="/" class="login-link">Sign in</a>
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+
+</html>
+{{ end}}

@@ -1,0 +1,71 @@
+{{/* Trailing "+ Add" buttons. Each is swapped (outerHTML) by the server for
+     [new block + this same button again]. Data: next_index as an integer. */}}
+{{ define "cv-add-experiences-button" }}
+<button type="button" class="btn-add-inline" id="cv-add-experiences"
+  hx-post="/cvs/snippets/experiences/add" hx-target="this" hx-swap="outerHTML"
+  hx-vals='{"next_index": {{ . }}}' aria-label="Add experience">
+  + Add experience
+</button>
+{{ end }}
+
+{{/* A single Experience block. Used for create (empty values) and edit
+     (pre-filled). Data: cvExperience with Index, Months, Years, Company,
+     Field, StartMonth, StartYear, EndMonth, EndYear, Current, Bullets. */}}
+{{ define "cv-experiences-block" }}
+<div class="cv-block">
+  <div class="cv-block-head">
+    <p class="cv-block-title">Experience</p>
+    <button type="button" class="btn-icon btn-danger" aria-label="Remove experience"
+      hx-delete="/cvs/snippets/experiences/{{ .Index }}"
+      hx-target="closest .cv-block" hx-swap="outerHTML">✕</button>
+  </div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>Company</label>
+      <input type="text" name="experiences_{{ .Index }}_company" value="{{ .Company }}" />
+    </div>
+    <div class="form-group">
+      <label>Role / Field</label>
+      <input type="text" name="experiences_{{ .Index }}_field" value="{{ .Field }}" />
+    </div>
+  </div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>Start (month-year)</label>
+      <div class="cv-date-row">
+        <select name="experiences_{{ .Index }}_start_month">
+          <option value="">Month</option>
+          {{ range .Months }}<option value="{{ .Value }}"{{ if eq .Value $.StartMonth }} selected{{ end }}>{{ .Label }}</option>{{ end }}
+        </select>
+        <select name="experiences_{{ .Index }}_start_year">
+          <option value="">Year</option>
+          {{ range .Years }}<option value="{{ . }}"{{ if eq . $.StartYear }} selected{{ end }}>{{ . }}</option>{{ end }}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>End (month-year)</label>
+      <div class="cv-date-row">
+        <select name="experiences_{{ .Index }}_end_month">
+          <option value="">Month</option>
+          {{ range .Months }}<option value="{{ .Value }}"{{ if eq .Value $.EndMonth }} selected{{ end }}>{{ .Label }}</option>{{ end }}
+        </select>
+        <select name="experiences_{{ .Index }}_end_year">
+          <option value="">Year</option>
+          {{ range .Years }}<option value="{{ . }}"{{ if eq . $.EndYear }} selected{{ end }}>{{ . }}</option>{{ end }}
+        </select>
+      </div>
+    </div>
+  </div>
+  <label class="cv-current-role">
+    <input type="checkbox" name="experiences_{{ .Index }}_current" value="true"{{ if .Current }} checked{{ end }} />
+    Currently work here
+  </label>
+  <div class="form-group full-width">
+    <label>Highlights</label>
+    {{ range $i, $b := .Bullets }}
+    <input type="text" name="experiences_{{ $.Index }}_bullet_{{ $i }}" value="{{ $b }}" placeholder="Achievement bullet…" />
+    {{ end }}
+  </div>
+</div>
+{{ end }}

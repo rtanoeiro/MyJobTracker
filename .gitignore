@@ -1,0 +1,10 @@
+tmp/*
+job-applications
+.env
+.env.dev
+.env.test
+.env.prod
+build/*
+.opencode/
+tasks/*
+internal/db/seed/*

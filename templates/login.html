@@ -1,0 +1,54 @@
+{{ block "login" . }}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — MyJobTracker</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4/dist/ext/response-targets.js"></script>
+</head>
+
+<body hx-boost="true" class="login-page">
+
+  <div class="login-container">
+
+    <div class="login-card">
+
+      <div class="login-header">
+        <img src="/static/logo.png" alt="MyJobTracker" class="logo-mark" />
+        <h1 class="login-title"><strong>MyJobTracker</strong></h1>
+        <p class="login-subtitle">Track your job applications with clarity</p>
+      </div>
+
+      <form class="login-form" hx-ext="response-targets" hx-post="/login" hx-target="#login-message"
+        hx-target-error="#login-message" hx-swap="innerHTML" hx-indicator="#login-btn">
+
+        <div class="form-group">
+          <label for="emailOrUsername">Email or Username</label>
+          <input type="emailOrUsername" id="emailOrUsername" name="emailOrUsername" required placeholder="you@example.com or you" autocomplete="email" />
+        </div>
+
+        <div id="login-message"></div>
+
+        <button type="submit" class="btn-primary btn-full" id="login-btn">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+
+      </form>
+
+      <div class="login-footer">
+        <a href="/register" class="login-link">Create account</a>
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+
+</html>
+{{ end }}

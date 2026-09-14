@@ -1,0 +1,63 @@
+services:
+  postgresql-job-applications:
+    image: postgres:17.9-alpine3.23
+    container_name: postgresql-job-applications
+    restart: unless-stopped
+    volumes:
+      - ${LOCAL_DATA_DIR}:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - TZ=UTC
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    image: job-applications:latest
+    container_name: job-applications-migrate
+    restart: "no"
+    depends_on:
+      postgresql-job-applications:
+        condition: service_healthy
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=${POSTGRES_DB_STRING}
+      - GOOSE_MIGRATION_DIR=/app/schema
+    command: ["./goose", "up"]
+
+  job-applications:
+    image: job-applications:latest
+    container_name: job-applications
+    depends_on:
+      postgresql-job-applications:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB_STRING=${POSTGRES_DB_STRING}
+      - PORT=${PORT}
+      - TZ=UTC
+    volumes:
+      - ../static:/app/static
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - "${ADMINER_PORT:-9100}:8080"
+    environment:
+      - TZ=UTC

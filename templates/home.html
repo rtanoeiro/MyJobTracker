@@ -1,0 +1,92 @@
+{{ block "home" .}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyJobTracker</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+
+<body hx-boost="true">
+
+  <div class="app-wrapper">
+
+    <!-- SIDEBAR NAV -->
+    <nav class="sidebar">
+      {{ template "sidebar" . }}
+    </nav>
+
+    <main class="main-content">
+
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title">Applications</h1>
+          <span class="breadcrumb">/ tracker</span>
+        </div>
+        <div class="topbar-right">
+
+          <div class="filter-bar">
+            <select name="status" class="filter-select" hx-get="/applications/filter" hx-trigger="change"
+              hx-target="#app-tbody" hx-swap="innerHTML" hx-include="[name='nameOrCompany']">
+              <option value="all">All Status</option>
+              <option value="Applied">Applied</option>
+              <option value="Processing">Processing</option>
+              <option value="Interview">Interview</option>
+              <option value="Offer">Offer</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+
+            <input type="text" name="nameOrCompany" class="search-input" placeholder="Search company or role…"
+              hx-get="/applications/filter" hx-trigger="input changed delay:300ms" hx-target="#app-tbody"
+              hx-swap="innerHTML" hx-include="[name='status']" />
+          </div>
+
+          <button class="btn-add" hx-get="/applications/new" hx-target="#modal-container" hx-swap="innerHTML">
+            + New Application
+          </button>
+
+        </div>
+      </header>
+
+      <section class="stats-bar" id="stats-bar" hx-get="/stats/bar" hx-trigger="load, stats-updated from:body"
+        hx-swap="innerHTML">
+      </section>
+
+      <section class="table-section">
+        <div class="table-wrapper">
+          <table class="app-table">
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Role</th>
+                <th>Work<br>Model</br></th>
+                <th>Location</th>
+                <th>Salary</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Followed<br>Up?</br></th>
+                <th>Interview<br>Date</br></th>
+                <th>Recruiter<br>Contact</br></th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="app-tbody" hx-get="/applications/list" hx-trigger="load, stats-updated from:body" hx-swap="innerHTML">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <div id="modal-container"></div>
+
+</body>
+
+</html>
+{{ end}}

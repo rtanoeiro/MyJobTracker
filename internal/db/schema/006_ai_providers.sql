@@ -1,0 +1,75 @@
+-- +goose Up
+CREATE TABLE ai_providers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    model VARCHAR(255) NOT NULL,
+    effort_level VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    base_url VARCHAR(255) NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_provider_model_effort UNIQUE (name, model, effort_level)
+);
+
+INSERT INTO ai_providers (name, model, effort_level, description, base_url, enabled) VALUES
+    ('OpenAI', 'gpt-6-astra', 'none', 'OpenAI GPT-6 Astra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-6-astra', 'low', 'OpenAI GPT-6 Astra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-6-astra', 'medium', 'OpenAI GPT-6 Astra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-6-astra', 'high', 'OpenAI GPT-6 Astra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-6-astra', 'xhigh', 'OpenAI GPT-6 Astra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-6-astra', 'max', 'OpenAI GPT-6 Astra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-sol', 'none', 'OpenAI GPT-5.6 Sol', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-sol', 'low', 'OpenAI GPT-5.6 Sol', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-sol', 'medium', 'OpenAI GPT-5.6 Sol', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-sol', 'high', 'OpenAI GPT-5.6 Sol', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-sol', 'xhigh', 'OpenAI GPT-5.6 Sol', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-sol', 'max', 'OpenAI GPT-5.6 Sol', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-terra', 'none', 'OpenAI GPT-5.6 Terra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-terra', 'low', 'OpenAI GPT-5.6 Terra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-terra', 'medium', 'OpenAI GPT-5.6 Terra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-terra', 'high', 'OpenAI GPT-5.6 Terra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-terra', 'xhigh', 'OpenAI GPT-5.6 Terra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-terra', 'max', 'OpenAI GPT-5.6 Terra', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-luna', 'none', 'OpenAI GPT-5.6 Luna', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-luna', 'low', 'OpenAI GPT-5.6 Luna', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-luna', 'medium', 'OpenAI GPT-5.6 Luna', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-luna', 'high', 'OpenAI GPT-5.6 Luna', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-luna', 'xhigh', 'OpenAI GPT-5.6 Luna', 'https://api.openai.com/v1', true),
+    ('OpenAI', 'gpt-5.6-luna', 'max', 'OpenAI GPT-5.6 Luna', 'https://api.openai.com/v1', true),
+    ('Anthropic', 'claude-fable-5-1', 'max', 'Claude Fable 5.1', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-fable-5-1', 'xhigh', 'Claude Fable 5.1', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-fable-5-1', 'high', 'Claude Fable 5.1', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-fable-5-1', 'medium', 'Claude Fable 5.1', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-fable-5-1', 'low', 'Claude Fable 5.1', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-opus-5', 'max', 'Claude Opus 5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-opus-5', 'xhigh', 'Claude Opus 5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-opus-5', 'high', 'Claude Opus 5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-opus-5', 'medium', 'Claude Opus 5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-opus-5', 'low', 'Claude Opus 5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-sonnet-5', 'max', 'Claude Sonnet 5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-sonnet-5', 'xhigh', 'Claude Sonnet 5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-sonnet-5', 'high', 'Claude Sonnet 5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-sonnet-5', 'medium', 'Claude Sonnet 5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-sonnet-5', 'low', 'Claude Sonnet 5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-haiku-4-5-20251001', 'max', 'Claude Haiku 4.5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-haiku-4-5-20251001', 'xhigh', 'Claude Haiku 4.5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-haiku-4-5-20251001', 'high', 'Claude Haiku 4.5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-haiku-4-5-20251001', 'medium', 'Claude Haiku 4.5', 'https://api.anthropic.com', true),
+    ('Anthropic', 'claude-haiku-4-5-20251001', 'low', 'Claude Haiku 4.5', 'https://api.anthropic.com', true),
+    ('DeepSeek', 'deepseek-v4-flash', 'max', 'DeepSeek Flash', 'https://api.deepseek.com/v1', true),
+    ('DeepSeek', 'deepseek-v4-flash', 'high', 'DeepSeek Flash', 'https://api.deepseek.com/v1', true),
+    ('DeepSeek', 'deepseek-v4-flash', 'low', 'DeepSeek Flash', 'https://api.deepseek.com/v1', true),
+    ('DeepSeek', 'deepseek-v4-pro', 'max', 'DeepSeek Pro', 'https://api.deepseek.com/v1', true),
+    ('DeepSeek', 'deepseek-v4-pro', 'high', 'DeepSeek Pro', 'https://api.deepseek.com/v1', true),
+    ('DeepSeek', 'deepseek-v4-pro', 'low', 'DeepSeek Pro', 'https://api.deepseek.com/v1', true),
+    ('DeepSeek', 'deepseek-v4-flash-vision-exp', 'max', 'DeepSeek Flash Vision', 'https://api.deepseek.com/v1', true),
+    ('DeepSeek', 'deepseek-v4-flash-vision-exp', 'high', 'DeepSeek Flash Vision', 'https://api.deepseek.com/v1', true),
+    ('DeepSeek', 'deepseek-v4-flash-vision-exp', 'low', 'DeepSeek Flash Vision', 'https://api.deepseek.com/v1', true)
+ON CONFLICT (name, model, effort_level) DO NOTHING;
+
+
+CREATE INDEX IF NOT EXISTS idx_ai_providers_enabled ON ai_providers (enabled);
+
+-- +goose Down
+DROP TABLE IF EXISTS ai_providers;

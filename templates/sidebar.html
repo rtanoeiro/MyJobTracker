@@ -1,0 +1,25 @@
+{{ define "sidebar" }}
+<div class="logo">
+    <img src="/static/logo.png" alt="MyJobTracker logo" class="logo-mark" />
+    <span class="logo-text"><strong>MyJobTracker</strong></span>
+</div>
+<ul class="nav-links">
+    <li {{ if eq .ActivePage "applications" }}class="active" {{ end }}><a href="/account/home"><span class="nav-icon">◈</span>
+            Applications</a></li>
+    <li {{ if eq .ActivePage "notes" }}class="active" {{ end }}><a href="/account/notes"><span class="nav-icon">◇</span>
+            Notes</a></li>
+    <li {{ if eq .ActivePage "cvs" }}class="active" {{ end }}><a href="/account/cvs"><span class="nav-icon">▤</span>
+            CVs</a></li>
+    <li {{ if eq .ActivePage "ai-chat" }}class="active" {{ end }}><a href="/account/ai"><span class="nav-icon">✦</span>
+            AI Chat</a></li>
+    <li {{ if eq .ActivePage "account-settings" }}class="active" {{ end }}><a href="/account/settings"><span
+            class="nav-icon">⚙</span> Account Settings</a></li>
+</ul>
+
+<div class="sidebar-footer">
+    <button class="btn-logout" hx-post="/logout" hx-push-url="true">
+        <span class="nav-icon">⎋</span>
+        <span>Sign out</span>
+    </button>
+</div>
+{{ end }}

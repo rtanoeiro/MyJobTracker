@@ -1,0 +1,32 @@
+{{ block "notes-list" . }}
+{{ if . }}
+  {{ range . }}
+  <article class="note-card" id="note-card-{{ .ID }}">
+    <div class="note-card-header">
+      <span class="badge badge-grey">general</span>
+      <button class="btn-icon btn-danger note-delete" 
+        hx-delete="/notes/{{ .ID }}" 
+        hx-target="#note-card-{{ .ID }}"
+        hx-swap="outerHTML" 
+        hx-confirm="Delete this note?">✕</button>
+    </div>
+    <button class="note-card-edit-trigger" 
+      hx-get="/notes/{{ .ID }}/edit" 
+      hx-target="#modal-container" 
+      hx-swap="innerHTML"
+      aria-label="Edit note">
+      <h3 class="note-card-title">{{ .NoteHeader }}</h3>
+      <p class="note-card-body">{{ .NoteText.String }}</p>
+    </button>
+    <div class="note-card-footer">
+      <span class="note-date">{{ .CreatedAt.Time.Format "02/01/2006 15:04" }}</span>
+    </div>
+  </article>
+  {{ end }}
+{{ else }}
+  <div class="empty-state" id="notes-empty">
+    <div class="empty-icon">◇</div>
+    <p>No notes yet. Create your first one.</p>
+  </div>
+{{ end }}
+{{ end }}

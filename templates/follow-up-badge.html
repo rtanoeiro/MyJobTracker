@@ -1,0 +1,25 @@
+{{ define "follow-up-badge" }}
+<td id="follow-up-{{.ID}}" hx-get="/applications/{{.ID}}/follow-up/edit" hx-target="#follow-up-{{.ID}}"
+  hx-swap="outerHTML" style="cursor:pointer; text-align:center">
+  {{ if .LastFollowUpContactAt.Valid }}
+  <span class="badge badge-yes" title='{{ .LastFollowUpContactAt.Time.Format "02/01/2006" }}'>✓</span>
+  {{ else }}
+  <span class="badge badge-no">✗</span>
+  {{ end }}
+</td>
+{{ end }}
+
+{{ define "follow-up-edit-form" }}
+<td id="follow-up-{{.ID}}" style="min-width:130px">
+  <form hx-put="/applications/{{.ID}}/follow-up" hx-target="#follow-up-{{.ID}}" hx-swap="outerHTML"
+    class="follow-up-form">
+    <input type="date" name="follow_up_date"
+      value="{{ if .LastFollowUpContactAt.Valid }}{{ .LastFollowUpContactAt.Time.Format " 2006-01-02" }}{{ end }}" />
+    <div class="follow-up-actions">
+      <button type="submit" class="btn-icon" title="Save">✓</button>
+      <button type="button" class="btn-icon" hx-get="/applications/{{.ID}}/follow-up" hx-target="#follow-up-{{.ID}}"
+        hx-swap="outerHTML" title="Cancel">✕</button>
+    </div>
+  </form>
+</td>
+{{ end }}

@@ -1,0 +1,91 @@
+{{ block "cv-edit-form" . }}
+<div class="modal-overlay open" id="modal-overlay"
+  hx-on:click="if (event.target === this) document.getElementById('modal-container').innerHTML=''">
+  <div class="modal modal-cv">
+    <div class="modal-header">
+      <h2>Edit CV</h2>
+      <button class="modal-close"
+        hx-on:click="document.getElementById('modal-container').innerHTML=''">✕</button>
+    </div>
+
+    <form class="modal-form" hx-put="/cvs/{{ .ID }}" hx-target="#cvs-grid" hx-swap="innerHTML"
+      hx-on::after-request="if (event.detail.elt === this) document.getElementById('modal-container').innerHTML=''">
+
+      <div class="form-group full-width cv-title-row">
+        <label>CV title *</label>
+        <input type="text" name="title" required value="{{ .Title }}" />
+      </div>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Profile</legend>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" name="profile_name" value="{{ .Profile.Name }}" />
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" name="profile_location" value="{{ .Profile.Location }}" />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Summary</legend>
+        <div class="form-group full-width">
+          <label>Professional summary</label>
+          <textarea name="summary" rows="5">{{ .Summary }}</textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Skills</legend>
+        <div class="form-group full-width">
+          <label>Skills (semicolon-separated)</label>
+          <textarea name="skills" rows="2" placeholder="Go; PostgreSQL; leadership…">{{ .Skills }}</textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Experience</legend>
+        {{ range .Experiences }}
+          {{ template "cv-experiences-block" . }}
+        {{ end }}
+        {{ template "cv-add-experiences-button" (len .Experiences) }}
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Education</legend>
+        <div class="form-group full-width">
+          <label>Education (semicolon-separated)</label>
+          <textarea name="education" rows="2" placeholder="Bachelors in Something, Acme University, 2017; Msc Degree, Acme University, 2021">{{ .Education }}</textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Certifications</legend>
+        <div class="form-group full-width">
+          <label>Certifications (semicolon-separated)</label>
+          <textarea name="certifications" rows="2" placeholder="Certified Something, 2019, Some Company; Certified at another thing, Another Company, 2021">{{ .Certifications }}</textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="cv-section">
+        <legend class="cv-section-title">Academic contributions</legend>
+        <div class="form-group full-width">
+          <label>Academic contributions (semicolon-separated)</label>
+          <textarea name="academic" rows="2" placeholder="A paper; a conference talk…">{{ .Academic }}</textarea>
+        </div>
+      </fieldset>
+
+      <div class="modal-actions">
+        <div>
+          <button type="button" class="btn-secondary"
+            hx-on:click="document.getElementById('modal-container').innerHTML=''">Cancel</button>
+          <button type="submit" class="btn-primary">Update CV</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{{ end }}

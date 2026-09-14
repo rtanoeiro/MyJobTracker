@@ -1,0 +1,35 @@
+{{ block "cvs-list" . }}
+{{ if . }}
+  {{ range . }}
+  <article class="cv-card" id="cv-card-{{ .ID }}">
+    <div class="cv-card-top">
+      <span class="badge badge-grey">CV</span>
+      <div class="cv-card-actions">
+        <button class="btn-icon" hx-get="/cvs/{{ .ID }}/edit" hx-target="#modal-container" hx-swap="innerHTML"
+          aria-label="Edit CV" title="Edit CV">✎</button>
+        <button class="btn-icon" hx-post="/cvs/{{ .ID }}/copy" aria-label="Copy CV" title="Copy CV">⧉</button>
+        <button class="btn-icon btn-danger cv-delete" hx-delete="/cvs/{{ .ID }}" hx-target="#cv-card-{{ .ID }}"
+          hx-swap="outerHTML" hx-confirm="Delete this CV?" aria-label="Delete CV" title="Delete CV">✕</button>
+      </div>
+    </div>
+    <button class="cv-card-edit-trigger" hx-get="/cvs/{{ .ID }}/edit" hx-target="#modal-container" hx-swap="innerHTML"
+      aria-label="Edit CV">
+      <span class="cv-card-file">▤</span>
+      <h3 class="cv-card-title">{{ .Title }}</h3>
+    </button>
+    <div class="cv-card-footer">
+      {{ if .UpdatedAt.Valid }}
+      <span class="cv-card-date">Updated {{ .UpdatedAt.Time.Format "02/01/2006" }}</span>
+      {{ else if .CreatedAt.Valid }}
+      <span class="cv-card-date">Added {{ .CreatedAt.Time.Format "02/01/2006" }}</span>
+      {{ end }}
+    </div>
+  </article>
+  {{ end }}
+{{ else }}
+  <div class="empty-state" id="cvs-empty">
+    <div class="empty-icon">▤</div>
+    <p>No CVs yet. Add your first one to enable AI matching.</p>
+  </div>
+{{ end }}
+{{ end }}

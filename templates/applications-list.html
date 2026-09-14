@@ -1,0 +1,44 @@
+{{ define "applications-list" }}
+{{ if . }}
+{{ range . }}
+<tr id="app-row-{{.ID}}" class="row-interview">
+    <td class="td-company">
+        {{ if .CompanyWebsite.Valid }}
+        <a href="{{ .CompanyWebsite.String }}" target="{{ .CompanyWebsite.String }}" class="company-link">
+            {{ .CompanyName }}</a>
+        {{ else }}
+        {{ .CompanyName }}
+        {{ end }}
+    </td>
+    <td>{{ .Role }}</td>
+    <td>{{ .WorkModel }}</td>
+    <td>{{ if .Location.Valid }}{{ .Location.String }}{{ else }}-{{ end }}</td>
+    <td class="td-salary">{{ if .Salary.Valid }}{{ .Salary.String }}{{ else }}-{{ end }}</td>
+    <td>{{ .Date.Time.Format "02/01/2006" }}</td>
+    <td>{{ .Status }}</td>
+    {{ template "follow-up-badge" . }}
+    <td>{{ if .InterviewDate.Valid }}{{ .InterviewDate.Time.Format "02/01/2006" }}{{ else }}-{{ end }}</td>
+    {{ if .ContactLinkedinProfile.Valid }}
+    <td><a href="{{ .ContactLinkedinProfile.String }}" target="{{ .ContactLinkedinProfile.String }}"
+            class="contact-link">Contact</a>
+    </td>
+    {{ else }}
+    <td>-</td>
+    {{ end }}
+    <td class="td-actions">
+        <button class="btn-icon" hx-get="/applications/{{.ID}}/edit" hx-target="#modal-container"
+            hx-swap="innerHTML">✎</button>
+        <button class="btn-icon btn-danger" hx-delete="/applications/{{.ID}}" hx-target="#app-row-{{ .ID}}"
+            hx-swap="outerHTML" hx-confirm="Delete this application?">✕</button>
+    </td>
+</tr>
+{{ end }}
+{{ else }}
+<tr>
+    <td colspan="10" style="text-align: center; padding: 2rem;">
+        <div class="empty-icon">◈</div>
+        <p>No applications yet. Add your first one.</p>
+    </td>
+</tr>
+{{ end }}
+{{ end }}

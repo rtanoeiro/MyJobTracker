@@ -1,0 +1,70 @@
+{{ block "application-form" . }}
+<div class="modal-overlay open" id="modal-overlay"
+  hx-on:click="if (event.target === this) document.getElementById('modal-container').innerHTML=''">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>New Application</h2>
+      <button class="modal-close" hx-on:click="document.getElementById('modal-container').innerHTML=''">✕</button>
+    </div>
+    <form class="modal-form" hx-post="/applications"
+      hx-on::after-request="document.getElementById('modal-container').innerHTML=''">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Company *</label>
+          <input type="text" name="company" required placeholder="e.g. Stripe" />
+        </div>
+        <div class="form-group">
+          <label>Company Website</label>
+          <input type="url" name="company_website" placeholder="e.g. https://www.companywebsite.com" />
+        </div>
+        <div class="form-group">
+          <label>Role *</label>
+          <input type="text" name="role" required placeholder="e.g. Senior Designer" />
+        </div>
+        <div class="form-group">
+          <label>Application Date*</label>
+          <input type="date" name="date" required value="{{ .Today }}" />
+        </div>
+        <div class="form-group">
+          <label>Work Model</label>
+          <select name="work_model">
+            <option value="Remote">Remote</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="Onsite">Onsite</option>
+            <option value="Not Specified">Not Specified</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Sector</label>
+          <input type="text" name="sector" placeholder="e.g. Fintech" />
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" name="location" placeholder="e.g. Remote / London" />
+        </div>
+        <div class="form-group">
+          <label>Salary</label>
+          <input type="text" name="salary" placeholder="e.g. £60,000" />
+        </div>
+        <div class="form-group full-width">
+          <label>Job Listing Link</label>
+          <input type="url" name="link" placeholder="https://..." />
+        </div>
+        <div class="form-group full-width">
+          <label>LinkedIn Contact</label>
+          <input type="text" name="contact" placeholder="linkedin.com/in/recruiter-name" />
+        </div>
+        <div class="form-group">
+          <label>Interview Date</label>
+          <input type="date" name="interview_date" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary"
+          hx-on:click="document.getElementById('modal-container').innerHTML=''">Cancel</button>
+        <button type="submit" class="btn-primary">Save Application</button>
+      </div>
+    </form>
+  </div>
+</div>
+{{ end }}

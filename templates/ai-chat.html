@@ -1,0 +1,114 @@
+{{ block "ai-chat" .}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyJobTracker — AI Chat</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx-ext-response-targets@2.0.4" integrity="sha384-T41oglUPvXLGBVyRdZsVRxNWnOOqCynaPubjUVjxhsjFTKrFJGEMm3/0KGmNQ+Pg" crossorigin="anonymous"></script>
+</head>
+
+<body hx-boost="true" hx-ext="response-targets">
+
+  <div class="app-wrapper">
+
+    <nav class="sidebar">
+      {{ template "sidebar" . }}
+    </nav>
+
+    <main class="main-content">
+
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title">AI Chat</h1>
+          <span class="breadcrumb">/ review assistant</span>
+        </div>
+      </header>
+
+      <section class="chat-shell">
+
+        {{ if not .AISettings.Enabled }}
+        <div class="chat-banner">
+          <span class="chat-banner-title">AI matching is not enabled.</span>
+          <span class="chat-banner-body">Choose a provider, a model and store an API key in
+            <a href="/account/settings">Account Settings</a> before asking for a review.</span>
+        </div>
+        {{ end }}
+
+        <div id="chat-error" class="chat-error"></div>
+
+        <div class="chat-card">
+
+          <form id="chat-review-form" class="chat-composer"
+            hx-post="/ai/chat"
+            hx-target="#chat-thread"
+            hx-swap="innerHTML scroll:bottom"
+            hx-include="#chat-transcript"
+            hx-target-error="#chat-error"
+            hx-swap-error="innerHTML">
+
+            <div class="chat-composer-head">
+              <span class="chat-label">Job description</span>
+              {{ if .AISettings.Enabled }}
+              <span class="chat-model-hint">{{ .AISettings.ProviderName }} · {{ .AISettings.ModelName }}</span>
+              {{ end }}
+            </div>
+
+            <div class="chat-composer-row">
+              <label class="chat-label" for="prompt-select">Review prompt</label>
+              <select id="prompt-select" name="prompt"
+                {{ if or (not .Prompts) (not .AISettings.Enabled) }}disabled{{ end }}>
+                {{ range $key, $value := .Prompts }}
+                <option value="{{ $value }}" {{ if eq $key "BASE" }}selected{{ end }}>{{ $key }}</option>
+                {{ end }}
+              </select>
+            </div>
+
+            <textarea id="jd-textarea" name="job_description" rows="6" required
+              placeholder="Paste the job description you want your CV reviewed against…"></textarea>
+
+            <div class="chat-composer-row">
+              <select id="cv-select" name="cv_id" required {{ if or (not .CVs) (not .AISettings.Enabled) }}disabled{{ end }}>
+                {{ if .CVs }}
+                <option value="" selected disabled>Choose a CV…</option>
+                {{ range .CVs }}
+                <option value="{{ .ID }}">{{ .Title }}</option>
+                {{ end }}
+                {{ else }}
+                <option value="" selected disabled>No CVs yet</option>
+                {{ end }}
+              </select>
+
+              <button type="submit" class="btn-primary chat-review-btn"
+                {{ if or (not .CVs) (not .AISettings.Enabled) }}disabled{{ end }}>
+                <span class="btn-spinner"></span>
+                <span class="btn-text">Review my CV</span>
+              </button>
+            </div>
+
+            {{ if not .CVs }}
+            <p class="chat-hint">You have no CVs yet — <a href="/account/cvs">create one</a> first.</p>
+            {{ end }}
+          </form>
+
+          <div id="chat-thread" class="chat-thread">
+            {{ template "ai-empty-chat" }}
+          </div>
+
+          {{ template "chat-followup-form" true }}
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+
+</html>
+{{ end }}

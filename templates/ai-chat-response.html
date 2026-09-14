@@ -1,0 +1,31 @@
+{{ define "chat-followup-form" }}
+<form id="chat-followup-form" class="chat-followup{{ if . }} is-hidden{{ end }}"
+  hx-post="/ai/chat"
+  hx-target="#chat-thread"
+  hx-swap="innerHTML scroll:bottom"
+  hx-target-error="#chat-error"
+  hx-swap-error="innerHTML"
+  hx-include="#chat-transcript, #cv-select, #prompt-select">
+  <textarea id="followup-input" name="follow_up" rows="1"
+    placeholder="Ask a follow-up about the review… (Enter to send, Shift+Enter for newline)"
+    autocomplete="off"
+    hx-on:keydown="if (event.key === 'Enter' && event.shiftKey) { return; } else if (event.key === 'Enter') { event.preventDefault(); this.form.requestSubmit(); }"></textarea>
+  <button type="submit" class="btn-primary chat-send-btn">
+    <span class="btn-spinner"></span>
+    <span class="btn-text">Send</span>
+  </button>
+  <button type="button" class="btn-secondary chat-clear-btn"
+    hx-get="/ai/chat/clear"
+    hx-target="#chat-thread"
+    hx-swap="innerHTML"
+    hx-confirm="Clear this conversation?">
+    Clear
+  </button>
+</form>
+{{ end }}
+
+{{ block "ai-chat-response" . }}
+{{ template "ai-chat-thread" .Thread }}
+<input type="hidden" id="chat-transcript" name="transcript" value="{{ .Transcript }}">
+{{ template "chat-followup-form" }}
+{{ end }}

@@ -1,0 +1,28 @@
+{{ block "note-edit-form" . }}
+<div class="modal-overlay open" id="modal-overlay"
+  hx-on:click="if (event.target === this) document.getElementById('modal-container').innerHTML=''">
+  <div class="modal modal-notes">
+    <div class="modal-header">
+      <input type="text" name="note_header" class="note-title-edit" placeholder="Note title…" form="note-form" value="{{ .NoteHeader }}" required />
+      <button class="modal-close"
+        hx-on:click="document.getElementById('modal-container').innerHTML=''">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea name="note_text" class="note-body-edit" placeholder="Write your note here…" form="note-form">{{ .NoteText.String }}</textarea>
+    </div>
+    <form id="note-form"
+      hx-put="/notes/{{ .ID }}"
+      hx-target="#notes-grid"
+      hx-swap="innerHTML"
+      hx-on::after-request="document.getElementById('modal-container').innerHTML=''">
+      <div class="modal-actions">
+        <div>
+          <button type="button" class="btn-secondary"
+            hx-on:click="document.getElementById('modal-container').innerHTML=''">Cancel</button>
+          <button type="submit" class="btn-primary">Update Note</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{{ end }}

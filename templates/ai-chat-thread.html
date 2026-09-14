@@ -1,0 +1,24 @@
+{{ block "ai-chat-thread" . }}
+{{ if . }}
+  {{ range . }}
+  <div class="chat-msg chat-msg-{{ .Role }}" data-role="{{ .Role }}">
+    <div class="chat-msg-meta">{{ if eq .Role "user" }}You{{ else }}Assistant{{ end }}</div>
+    {{ if eq .Role "assistant" }}
+    <div class="chat-msg-text chat-msg-html">{{ safeHTML .Content }}</div>
+    {{ else }}
+    <pre class="chat-msg-text">{{ .Content }}</pre>
+    {{ end }}
+  </div>
+  {{ end }}
+{{ else }}
+  {{ template "ai-empty-chat" }}
+{{ end }}
+{{ end }}
+
+{{ define "ai-empty-chat" }}
+  <div class="chat-empty">
+    <div class="chat-empty-icon">💬</div>
+    <p>No conversation yet.</p>
+    <p>Paste a job description above, pick one of your CVs, and ask for an AI review.</p>
+  </div>
+{{ end }}

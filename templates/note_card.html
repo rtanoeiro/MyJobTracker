@@ -1,0 +1,14 @@
+{{ define "note_card" }}
+<article class="note-card" id="note-card-{id}">
+    <div class="note-card-header">
+        <span class="badge badge-yellow">interview</span>
+        <button class="btn-icon btn-danger note-delete" hx-delete="/notes/{id}" hx-target="#note-card-{id}"
+            hx-swap="outerHTML" hx-confirm="Delete this note?">✕</button>
+    </div>
+    <h3 class="note-card-title">{{ .NoteHeader}}</h3>
+    <p class="note-card-body">{{ .NoteTExt}}</p>
+    <div class="note-card-footer">
+        <span class="note-date">{{ .CreatedAt.Format "02/01/2006 15:04"}}</span>
+    </div>
+</article>
+{{ end }}

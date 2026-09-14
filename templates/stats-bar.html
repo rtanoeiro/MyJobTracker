@@ -1,0 +1,14 @@
+{{ define "stats-bar" }}
+<div class="stat-card">
+    <span class="stat-big">{{ .TotalApplications }}</span>
+    <span class="stat-desc">Total Applications</span>
+</div>
+<div class="stat-card accent-yellow">
+    <span class="stat-big">{{ .TotalInterviews }}</span>
+    <span class="stat-desc">Interviews</span>
+</div>
+<div class="stat-card accent-blue">
+    <span class="stat-big">{{ .TotalPending }}</span>
+    <span class="stat-desc">Pending</span>
+</div>
+{{ end }}
