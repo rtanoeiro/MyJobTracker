@@ -222,7 +222,7 @@ func (handler *AIHandler) Page(writer http.ResponseWriter, request *http.Request
 }
 
 func validateAISettings(settings db.UserAiSetting) bool {
-	if settings.ProviderName == "" || settings.ModelName == "" || settings.EffortLevel == "" || settings.Key.Valid {
+	if settings.ProviderName == "" || settings.ModelName == "" || settings.EffortLevel == "" || !settings.Key.Valid {
 		return false
 	}
 	return true
