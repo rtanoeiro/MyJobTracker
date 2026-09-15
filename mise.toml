@@ -49,7 +49,12 @@ run = "sqlc generate"
 description = "Run goose migrations (Safe for Production as it only adds attributes to tables)"
 run = "goose up"
 
-[tasks.migrate-down]
+[tasks.setup-dev-data]
+description = "Run goose migrations (Safe for Production as it only adds attributes to tables)"
+depends = ["migrate"]
+run = "bash ./seed.sh up"
+
+[tasks.cleanup-dev-data]
 description = "Run goose migrations down (WARNING: ONLY USE THIS IN DEV, AS THIS DELETES ALL DATA)"
 run = "goose down-to 0"
 
