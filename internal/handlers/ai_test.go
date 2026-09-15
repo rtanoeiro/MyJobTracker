@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -185,6 +186,21 @@ func TestAIChat_InvalidTranscript(t *testing.T) {
 
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want %d", w.Code, http.StatusBadRequest)
+	}
+}
+
+func TestAIChat_ParseFormError(t *testing.T) {
+	handler := newAIHandler(&MockAIStore{}, ai.OpenAIClient{}, false)
+	// An invalid percent-escape in a form-encoded body makes ParseForm fail.
+	req := httptest.NewRequest(http.MethodPost, "/ai/chat", strings.NewReader("cv_id=%zz"))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req = withUserID(req, 1)
+	w := httptest.NewRecorder()
+
+	handler.Chat(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusInternalServerError)
 	}
 }
 

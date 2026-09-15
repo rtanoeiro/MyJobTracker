@@ -1,11 +1,21 @@
 package templates
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 )
+
+type failingResponseWriter struct {
+	header http.Header
+	code   int
+}
+
+func (f *failingResponseWriter) Header() http.Header        { return f.header }
+func (f *failingResponseWriter) WriteHeader(statusCode int) { f.code = statusCode }
+func (f *failingResponseWriter) Write([]byte) (int, error)  { return 0, errors.New("write failed") }
 
 func TestRenderResponseMessage_ErrorClass(t *testing.T) {
 	codes := []int{http.StatusBadRequest, http.StatusNotFound, http.StatusInternalServerError}
@@ -61,5 +71,14 @@ func TestRenderResponseMessage_ContentType(t *testing.T) {
 	ct := w.Header().Get("Content-Type")
 	if ct != "text/html; charset=utf-8" {
 		t.Errorf("Content-Type = %q, want text/html; charset=utf-8", ct)
+	}
+}
+
+func TestRenderResponseMessage_WriteError(t *testing.T) {
+	w := &failingResponseWriter{header: http.Header{}}
+	RenderResponseMessage(w, http.StatusInternalServerError, "boom")
+
+	if w.code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want %d", w.code, http.StatusInternalServerError)
 	}
 }

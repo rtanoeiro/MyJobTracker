@@ -532,6 +532,28 @@ func TestUpdateEmail_StoreError(t *testing.T) {
 	}
 }
 
+func TestUpdateAISettings_GetSettingsError(t *testing.T) {
+	store := &MockSettingsStore{ErrGetAISettings: uniqueViolation()}
+	handler := NewSettingsHandler(store, &spyRenderer{})
+
+	values := url.Values{
+		"provider_name": {"OpenAI"},
+		"model_name":    {"gpt-6-astra"},
+		"effort_level":  {"high"},
+		"encrypted_key": {"sk-test"},
+		"enabled":       {"true"},
+	}
+	w := httptest.NewRecorder()
+	handler.UpdateAISettings(w, settingsFormRequest(http.MethodPut, "/account/settings", values))
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusInternalServerError)
+	}
+	if store.UpsertCalled {
+		t.Error("expected no upsert when settings lookup fails")
+	}
+}
+
 func TestUpdateAISettings_MissingEffort(t *testing.T) {
 	store := &MockSettingsStore{ErrGetAISettings: pgx.ErrNoRows}
 	handler := NewSettingsHandler(store, &spyRenderer{})
@@ -882,6 +904,25 @@ func TestOrderedEfforts_UnknownEffortsFallBackAlphabetically(t *testing.T) {
 	want := []string{"low", "custom-a", "custom-b"}
 	if got := orderedEfforts("OpenAI", input); !reflect.DeepEqual(got, want) {
 		t.Errorf("orderedEfforts = %v, want %v", got, want)
+	}
+}
+
+func TestOrderedEfforts_KnownBeforeUnknown(t *testing.T) {
+	// A known effort always sorts ahead of an unknown one, regardless of input
+	// order. The two-element slice deterministically exercises both comparison
+	// directions (known-first and unknown-first).
+	for _, tt := range []struct {
+		name  string
+		input []string
+	}{
+		{"known first", []string{"low", "custom"}},
+		{"unknown first", []string{"custom", "low"}},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := orderedEfforts("OpenAI", tt.input); !reflect.DeepEqual(got, []string{"low", "custom"}) {
+				t.Errorf("orderedEfforts(%v) = %v, want [low custom]", tt.input, got)
+			}
+		})
 	}
 }
 

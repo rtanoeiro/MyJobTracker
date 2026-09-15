@@ -331,3 +331,45 @@ func TestBuildCreateCVParams_EmptySections(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildCVEditFormData_PopulatesSummary(t *testing.T) {
+	row := cvRow()
+	row.Summary = pgtype.Text{String: "A short summary", Valid: true}
+
+	data, err := buildCVEditFormData(row)
+	if err != nil {
+		t.Fatalf("buildCVEditFormData: %v", err)
+	}
+	if data.Summary != "A short summary" {
+		t.Fatalf("summary = %q, want %q", data.Summary, "A short summary")
+	}
+}
+
+func TestBuildCVEditFormData_ExperiencesDecodeError(t *testing.T) {
+	row := cvRow()
+	row.Experiences = []byte(`[{"company":`)
+
+	if _, err := buildCVEditFormData(row); err == nil {
+		t.Fatal("expected experiences decode error, got nil")
+	}
+}
+
+func TestCleanFormFields_RemovesEmptyValues(t *testing.T) {
+	form := url.Values{
+		"title":  {"CV"},
+		"empty":  {""},
+		"spaces": {"   "},
+	}
+
+	cleaned := cleanFormFields(form)
+
+	if cleaned.Get("title") != "CV" {
+		t.Errorf("title = %q, want CV", cleaned.Get("title"))
+	}
+	if _, ok := cleaned["empty"]; ok {
+		t.Error("expected empty-valued field to be removed")
+	}
+	if cleaned.Get("spaces") != "   " {
+		t.Errorf("whitespace-only field should be preserved verbatim, got %q", cleaned.Get("spaces"))
+	}
+}

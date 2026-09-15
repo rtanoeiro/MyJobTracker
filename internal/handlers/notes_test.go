@@ -145,6 +145,19 @@ func TestNotesCreate_DBError(t *testing.T) {
 	}
 }
 
+func TestNotesEditForm_NoUserID(t *testing.T) {
+	handler := NewNotesHandler(&MockNotesStore{}, newMockRenderer(false))
+
+	req := requestWithURLParam(http.MethodGet, "/notes/1/edit", "id", "1")
+	w := httptest.NewRecorder()
+
+	handler.EditForm(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusInternalServerError)
+	}
+}
+
 func TestNotesEditForm_InvalidID(t *testing.T) {
 	handler := NewNotesHandler(&MockNotesStore{}, newMockRenderer(false))
 
@@ -204,6 +217,19 @@ func TestNotesEditForm_Success(t *testing.T) {
 	}
 }
 
+func TestNotesDelete_NoUserID(t *testing.T) {
+	handler := NewNotesHandler(&MockNotesStore{}, newMockRenderer(false))
+
+	req := requestWithURLParam(http.MethodDelete, "/notes/5", "id", "5")
+	w := httptest.NewRecorder()
+
+	handler.Delete(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusInternalServerError)
+	}
+}
+
 func TestNotesDelete_InvalidID(t *testing.T) {
 	handler := NewNotesHandler(&MockNotesStore{}, newMockRenderer(false))
 
@@ -243,6 +269,20 @@ func TestNotesDelete_DBError(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	handler.Delete(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusInternalServerError)
+	}
+}
+
+func TestNotesUpdate_NoUserID(t *testing.T) {
+	handler := NewNotesHandler(&MockNotesStore{}, newMockRenderer(false))
+
+	values := url.Values{"note_header": {"Updated"}}
+	req := formRequestWithURLParam(http.MethodPut, "/notes/1", values, "id", "1")
+	w := httptest.NewRecorder()
+
+	handler.Update(w, req)
 
 	if w.Code != http.StatusInternalServerError {
 		t.Errorf("status = %d, want %d", w.Code, http.StatusInternalServerError)
