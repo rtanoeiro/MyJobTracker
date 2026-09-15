@@ -1,7 +1,7 @@
 services:
-  postgresql-job-applications:
+  postgresql-myjobtracker:
     image: postgres:17.9-alpine3.23
-    container_name: postgresql-job-applications
+    container_name: postgresql-myjobtracker
     restart: unless-stopped
     volumes:
       - ${LOCAL_DATA_DIR}:/var/lib/postgresql/data
@@ -17,11 +17,11 @@ services:
       retries: 5
 
   migrate:
-    image: job-applications:latest
-    container_name: job-applications-migrate
+    image: rtanoeiro/myjobtracker:latest-arm64
+    container_name: myjobtracker-migrate
     restart: "no"
     depends_on:
-      postgresql-job-applications:
+      postgresql-myjobtracker:
         condition: service_healthy
     environment:
       - GOOSE_DRIVER=postgres
@@ -29,11 +29,11 @@ services:
       - GOOSE_MIGRATION_DIR=/app/schema
     command: ["./goose", "up"]
 
-  job-applications:
-    image: job-applications:latest
-    container_name: job-applications
+  myjobtracker:
+    image: rtanoeiro/myjobtracker:latest-arm64
+    container_name: myjobtracker
     depends_on:
-      postgresql-job-applications:
+      postgresql-myjobtracker:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully

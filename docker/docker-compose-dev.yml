@@ -1,10 +1,10 @@
 services:
-  postgresql-job-applications:
+  postgresql-myjobtracker:
     image: postgres:17.9-alpine3.23
-    container_name: postgresql-job-applications
+    container_name: postgresql-myjobtracker
     restart: unless-stopped
     ports:
-      - "${POSTGRES_HOST_PORT:-5433}:5432"
+      - "5433:5432"
     volumes:
       - ${LOCAL_DATA_DIR}:/var/lib/postgresql/data
       - ../internal/db/seed/:/app/internal/db/seed/

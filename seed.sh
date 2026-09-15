@@ -6,9 +6,9 @@ OPTION=$1
 source .env
 
 if [ "$OPTION" == "up" ]; then
-    docker exec postgresql-job-applications psql -U $POSTGRES_USER -d $POSTGRES_DB -f app/internal/db/seed/001_seed.sql
+    docker exec postgresql-myjobtracker psql -U $POSTGRES_USER -d $POSTGRES_DB -f app/internal/db/seed/001_seed.sql
 elif [ "$OPTION" == "down" ]; then
-    docker exec postgresql-job-applications psql -U $POSTGRES_USER -d $POSTGRES_DB -f app/internal/db/seed/002_remove_seed.sql
+    docker exec postgresql-myjobtracker psql -U $POSTGRES_USER -d $POSTGRES_DB -f app/internal/db/seed/002_remove_seed.sql
 else
     echo "Invalid option"
     exit 1
