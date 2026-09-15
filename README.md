@@ -1,6 +1,6 @@
 # MyJobTracker
 
-A full-stack job-application tracker. Register once, log every application you send, watch it move through your pipeline, and keep the details that matter close at hand — all in one place.
+A full-stack job applications tracker. Register once, log every application you send, watch it move through your pipeline, and keep the details that matter close at hand — all in one place.
 
 **Passwordless.** There are no passwords. You sign in with your email or username; the app issues a 24h session cookie (extended while you're active).
 
@@ -20,10 +20,13 @@ A full-stack job-application tracker. Register once, log every application you s
 - [Getting started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Configuration](#configuration)
-  - [Run locally (dev)](#run-locally-dev)
-  - [Run the checks](#run-the-checks)
-  - [Database](#database)
+  - [Deploy (prod)](#deploy-prod)
 - [Contributing](#contributing)
+  - [Development environment](#development-environment)
+  - [Run locally (dev)](#run-locally-dev)
+  - [Building](#building)
+  - [Checks](#checks)
+  - [Database](#database)
 - [Project layout](#project-layout)
 - [Roadmap: AI-assisted matching (future)](#roadmap-ai-assisted-matching-future)
 
@@ -115,29 +118,42 @@ Key variables (see `.env.example` for the full list):
 | `PORT` | HTTP port the app listens on (default `9000`) |
 | `POSTGRES_DB_STRING` | Single full PostgreSQL connection string per environment |
 | `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | Used by Docker Compose to spin up Postgres |
-| `POSTGRES_HOST_PORT` | Host port Postgres is published on (dev only; prod exposes no host port) |
 | `ADMINER_PORT` | Host port for Adminer |
-| `GOOSE_DBSTRING` / `GOOSE_MIGRATION_DIR` | Used by host-run Goose to apply dev migrations |
-
-### Run locally (dev)
-
-```bash
-mise run up-dev      # start PostgreSQL (and Adminer) containers
-mise run migrate     # apply schema migrations (goose up)
-air                  # start the app with hot reload
-```
-
-`air` (installed for you by mise) watches your Go and template files and rebuilds/restarts the app on every change, so you never restart manually during development. Stop it with `Ctrl-C` and bring the database down with `mise run down-dev` when you're done.
-
-Then open <http://localhost:9000>, register an account, and start logging applications.
 
 ### Deploy (prod)
 
 In prod both Postgres and the app run as containers (self-contained; Postgres exposes no host port). All prod values come from a single `.env` file — see [Configuration](#configuration).
 
+#### Configure `.env` for prod
+
+Prod uses only the `POSTGRES_DB_STRING` pointing at the Postgres service name over the Compose network. The `GOOSE_*` block and the `localhost` connection string must stay commented out:
+
+```bash
+## Environments for running Migrations with Goose (host-run, dev only)
+# GOOSE_DRIVER=postgres
+# GOOSE_DBSTRING="postgresql://jobtracker:jobtracker@localhost:5433/jobs?sslmode=disable"
+# GOOSE_MIGRATION_DIR="./internal/db/schema/"
+
+# POSTGRES_DB_STRING="postgresql://jobtracker:jobtracker@localhost:5433/jobs?sslmode=disable"
+
+## Prod: used by the app and migrate containers over the compose network (service name), so no host port is exposed.
+POSTGRES_DB_STRING="postgresql://jobtracker:jobtracker@postgresql-myjobtracker:5432/jobs?sslmode=disable"
+
+## Docker Compose host ports (only dev publishes Postgres; prod does not expose it to the host)
+ADMINER_PORT=9100
+## App Variables
+PORT=9000
+
+## Docker Compose for PostgreSQL
+LOCAL_DATA_DIR="PATH_TO_DOCKER_MOUNTED_VOLUME"
+POSTGRES_DB="jobs"
+POSTGRES_USER="jobtracker"
+POSTGRES_PASSWORD="jobtracker"
+```
+
 #### With Docker Compose (Recommended)
 
-`docker/docker-compose.yml` defines `postgresql-job-applications`, `migrate`, and `job-applications` (plus Adminer). The `migrate` service depends on Postgres being healthy; the app waits on `migrate` completing successfully.
+`docker/docker-compose.yml` defines `postgresql-myjobtracker`, `migrate`, and `myjobtracker` (plus Adminer). The `migrate` service depends on Postgres being healthy; the app waits on `migrate` completing successfully.
 
 ```bash
 docker compose -f docker/docker-compose.yml --env-file .env up -d
@@ -155,7 +171,7 @@ docker network create jobtracker
 1. **Postgres**
 
 ```bash
-docker run -d --name postgresql-job-applications \
+docker run -d --name postgresql-myjobtracker \
   --network jobtracker \
   --restart unless-stopped \
   -v "${LOCAL_DATA_DIR}:/var/lib/postgresql/data" \
@@ -173,36 +189,53 @@ docker run --rm --network jobtracker \
   -e GOOSE_DRIVER=postgres \
   -e GOOSE_DBSTRING="${POSTGRES_DB_STRING}" \
   -e GOOSE_MIGRATION_DIR=/app/schema \
-  job-applications:latest ./goose up
+  myjobtracker:latest ./goose up
 ```
 
 3. **Start the app**
 
 ```bash
-docker run -d --name job-applications \
+docker run -d --name myjobtracker \
   --network jobtracker \
   --restart unless-stopped \
   -p 9000:9000 \
   -e POSTGRES_DB_STRING="${POSTGRES_DB_STRING}" \
   -e PORT=9000 \
   -e TZ=UTC \
-  job-applications:latest
+  myjobtracker:latest
 ```
 
 > `mise run up-prod` / `down-prod` are convenience wrappers for the Compose commands above.
 
 ## Contributing
 
-### Building
+### Development environment
 
-The app is packaged as a Docker image named `job-applications:latest` (the name `docker/docker-compose.yml` expects). Use the `mise run` wrappers so the consistent platform flags are applied:
+In dev, Postgres runs in a container while the app and Goose run on the host (`air` and `mise run migrate`), both reaching Postgres via `localhost`. Configure `.env` with the `GOOSE_*` block and the `localhost` connection string uncommented, and the `postgresql-myjobtracker` one commented out:
 
 ```bash
-mise run build          # build the amd64 image (linux/amd64)
-mise run build-arm64    # build the arm64 image
+## Environments for running Migrations with Goose (host-run, dev only)
+GOOSE_DRIVER=postgres
+GOOSE_DBSTRING="postgresql://jobtracker:jobtracker@localhost:5433/jobs?sslmode=disable"
+GOOSE_MIGRATION_DIR="./internal/db/schema/"
+
+## Dev: air (Go on host) and host-run goose both reach Postgres via localhost.
+POSTGRES_DB_STRING="postgresql://jobtracker:jobtracker@localhost:5433/jobs?sslmode=disable"
+
+# POSTGRES_DB_STRING="postgresql://jobtracker:jobtracker@postgresql-myjobtracker:5432/jobs?sslmode=disable"
 ```
 
-The Dockerfile (`docker/Dockerfile`) builds the Go binary, bundles the `goose` migration runner and `internal/db/schema/`, then copies in `static/` and `templates/` for a self-contained runtime image.
+### Building - Dev Setup
+
+```bash
+mise run up-dev      # start PostgreSQL (and Adminer) containers
+mise run migrate     # apply schema migrations (goose up)
+air                  # start the app with hot reload
+```
+
+`air` (installed for you by mise) watches your Go and template files and rebuilds/restarts the app on every change, so you never restart manually during development. Stop it with `Ctrl-C` and bring the database down with `mise run down-dev` when you're done.
+
+Then open <http://localhost:9000>, login with the `test` account, and start building.
 
 ### Checks
 
@@ -211,8 +244,6 @@ Before opening a change, run the full suite:
 ```bash
 mise run checks         # clean + fmt + lint + sec + govul + test
 ```
-
-This runs `gofmt`, `golangci-lint`, `gosec`, `govulncheck`, and the unit tests with coverage — all through the `mise run` wrappers (never run the underlying tools directly).
 
 ### Database
 
@@ -223,6 +254,21 @@ mise run migrate          # apply migrations (up)
 mise run migrate-down     # WARNING: dev/test only, drops all data
 mise run sqlc-generate    # regenerate sqlc code after editing queries
 ```
+
+### Building
+
+The app is packaged as a Docker image named `myjobtracker:latest` (the name `docker/docker-compose.yml` expects). Use the `mise run` wrappers so the consistent platform flags are applied:
+
+```bash
+mise run build          # build the amd64 image (linux/amd64)
+mise run build-arm64    # build the arm64 image
+```
+
+The Dockerfile (`docker/Dockerfile`) builds the Go binary, bundles the `goose` migration runner and `internal/db/schema/`, then copies in `static/` and `templates/` for a self-contained runtime image.
+
+
+This runs `gofmt`, `golangci-lint`, `gosec`, `govulncheck`, and the unit tests with coverage — all through the `mise run` wrappers (never run the underlying tools directly).
+
 
 ## Project layout
 
